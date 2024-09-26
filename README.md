@@ -2,6 +2,8 @@
 
 ## *Project Idea*
 
+I am going to build something that combines a calendar and a task manager. 
+
 ## What will the application do?
 
 The application has two main features. First, the sidebar allows users to input tasks they need to complete. Unlike a common to-do list, when users input tasks in the sidebar, they must include a date, ensuring that daily tasks are presented on the sidebar each day. The second feature is a calendar view, similar to Google Calendar. What I really want to emphasize is the interaction between these two components, where users can drag and drop tasks into the calendar, making time-blocking much more intuitive.
