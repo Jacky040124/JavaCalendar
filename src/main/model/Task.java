@@ -18,7 +18,7 @@ public class Task {
     
     // MODIFIES: this
     // EFFECTS: chnage the state of Done, either to true or false
-    public void setDone(){
+    public void setDone(boolean state){
         // TODO
     }
 
@@ -42,6 +42,10 @@ public class Task {
         return "";
     }
 
+    public Boolean getDone(){
+        // TODO
+        return false;
+    }
 
 
 
