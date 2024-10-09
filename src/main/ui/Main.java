@@ -1,5 +1,7 @@
-package main.ui;
+package ui;
 
-public static void main(String[] args) {
-    new CalendarView();
+public class Main {
+    public static void main(String[] args) {
+        new CalendarView();
+    }
 }

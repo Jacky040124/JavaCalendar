@@ -25,11 +25,11 @@ public class TaskTest {
         assertEquals("10/10/2024",testTask1.getDate());
         assertEquals("12:00",testTask1.getTime());
 
-        assertFalse(testTask1.getDone());
-        assertEquals("eat dinner",testTask1.getName());
-        assertEquals(1,testTask1.getLength());
-        assertEquals("10/10/2024",testTask1.getDate());
-        assertEquals("14:00",testTask1.getTime());
+        assertFalse(testTask2.getDone());
+        assertEquals("eat dinner",testTask2.getName());
+        assertEquals(1,testTask2.getLength());
+        assertEquals("10/10/2024",testTask2.getDate());
+        assertEquals("14:00",testTask2.getTime());
     }
 
     @Test

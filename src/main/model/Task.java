@@ -19,32 +19,27 @@ public class Task {
     // MODIFIES: this
     // EFFECTS: chnage the state of Done, either to true or false
     public void setDone(boolean state){
-        // TODO
+        this.done = state;
     }
 
     public String getName(){
-        // TODO
-        return "";
+        return this.name;
     }
 
     public int getLength(){
-        // TODO
-        return 0;
+        return this.length;
     }
 
     public String getDate(){
-        // TODO
-        return "";
+        return this.date;
     }
 
     public String getTime(){
-        // TODO
-        return "";
+        return this.time;
     }
 
     public Boolean getDone(){
-        // TODO
-        return false;
+        return this.done;
     }
 
 
