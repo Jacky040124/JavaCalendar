@@ -1,10 +1,9 @@
 package model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import main.model.ListToDo;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ListToDoTest {
     private Task testTask1;
@@ -20,28 +19,28 @@ public class ListToDoTest {
 
     @Test
     void testConstructor() {
-        assertEqual(0,testList.size());
+        assertEquals(0,testList.getList().size());
     }
 
     @Test
     void testAddTask() {
-        testList.addTask(testTask1)
-        assertEqual(1,testList.size())
-        testList.addTask(testTask2)
-        testList.addTask(testTask2)
-        assertEqual(3,testList.size())
+        testList.addTask(testTask1);
+        assertEquals(1,testList.getList().size());
+        testList.addTask(testTask2);
+        testList.addTask(testTask2);
+        assertEquals(3,testList.getList().size());
     }
 
     @Test
     void testRemoveTask() {
-        testList.addTask(testTask1)
-        testList.removeTask(testTask1)
-        assertEqual(0,testList.size())
-        testList.addTask(testTask1)
-        testList.addTask(testTask2)
-        testList.removeTask(testTask2)
-        assertEqual(1,testList.size())
-        testList.removeTask(testTask1)
-        assertEqual(0,testList.size())
+        testList.addTask(testTask1);
+        testList.removeTask(testTask1);
+        assertEquals(0,testList.getList().size());
+        testList.addTask(testTask1);
+        testList.addTask(testTask2);
+        testList.removeTask(testTask2);
+        assertEquals(1,testList.getList().size());
+        testList.removeTask(testTask1);
+        assertEquals(0,testList.getList().size());
     }
 }
