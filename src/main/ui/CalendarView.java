@@ -2,16 +2,13 @@ package ui;
 import java.util.Scanner;
 import model.ListToDo;
 import model.Task;
-import java.util.HashMap;
 
 public class CalendarView {
     private ListToDo lst;
     private Scanner input;
-    private HashMap<String, String> availability;
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
-        availability = new HashMap<>();
         input = new Scanner(System.in);
         lst = new ListToDo();
         runCalendar();
@@ -51,8 +48,8 @@ public class CalendarView {
             String strToPrint = String.format("%02d:00", i);
             for (int j = 0; j < 7; j++) {
                 String key = Integer.toString(j) +":"+ Integer.toString(i);
-                if (availability.containsKey(key)) {
-                    strToPrint += String.format("|%-10s", availability.get(key)); 
+                if (lst.getAvailability().containsKey(key)) {
+                    strToPrint += String.format("|%-10s", lst.getAvailability().get(key)); 
                 } else {
                     strToPrint += "|          ";
                 }
@@ -143,7 +140,7 @@ public class CalendarView {
         String strDay = Integer.toString(task.getDay());
         for (int i = 0; i < task.getLength(); i++) {
             String strTime = Integer.toString(task.getTime()+i);
-            if (availability.containsKey(strDay+":"+ strTime)) {
+            if (lst.getAvailability().containsKey(strDay+":"+ strTime)) {
                 return false;
             }
 
@@ -157,7 +154,7 @@ public class CalendarView {
         for (int i = 0; i < task.getLength(); i++) {
                 String strDay = Integer.toString(task.getDay());
                 String strTime = Integer.toString(task.getTime()+i);
-            availability.put(strDay+":"+ strTime,task.getName());
+                lst.getAvailability().put(strDay+":"+ strTime,task.getName());
             System.out.println("availability added" + strDay+":"+ strTime);
         }
     }

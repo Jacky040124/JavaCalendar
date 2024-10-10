@@ -47,6 +47,4 @@ public class Task {
         return this.done;
     }
 
-
-
 }

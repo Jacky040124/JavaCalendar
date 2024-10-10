@@ -1,5 +1,7 @@
 package model;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Represents a to-do list consisting of a collection of tasks.
@@ -9,9 +11,11 @@ import java.util.ArrayList;
 
 public class ListToDo {
     private ArrayList<Task> list;
+    private HashMap<String, String> availability;
 
     public ListToDo() {
         this.list = new ArrayList<Task>();
+        this.availability = new HashMap<>();
     }
 
 
@@ -31,5 +35,9 @@ public class ListToDo {
 
     public ArrayList<Task> getList() {
         return this.list;
+    }
+
+    public HashMap<String, String> getAvailability(){
+        return this.availability;
     }
 }
