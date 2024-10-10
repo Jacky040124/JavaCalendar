@@ -27,6 +27,3 @@ Well, I am really interested in time management software myself, and I've been u
 - As a user, I want to be able to see my the tasks in need to do in a calendar view
 
 - As a user, I want to have my task sync to my calendar without me having to manually enter it
-
-- As a user, I want my task to cross out on the calendar when I am done with it (very satisfying experience)
-
