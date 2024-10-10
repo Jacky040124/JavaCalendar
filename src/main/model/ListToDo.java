@@ -1,6 +1,12 @@
 package model;
 import java.util.ArrayList;
 
+/**
+ * Represents a to-do list consisting of a collection of tasks.
+ * Able to add and remove tasks to/from the list.
+ * Duplicaiton of task is allowed as long as they don't occupy the same time slot
+ */
+
 public class ListToDo {
     private ArrayList<Task> list;
 

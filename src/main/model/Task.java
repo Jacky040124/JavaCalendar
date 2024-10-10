@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Represents a task in the list to do or calendar
+ * Each task has a name, length (duration), day of the week, and time to start
+ * The task can also be marked as done or not done. 
+ */
 
 public class Task {
     private int day;
