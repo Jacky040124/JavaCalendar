@@ -13,8 +13,8 @@ public class TaskTest {
     
     @BeforeEach
     void runBefore() {
-        testTask1 = new Task("do homework",2,"10/10/2024","12:00");
-        testTask2 = new Task("eat dinner",1,"10/10/2024","14:00");
+        testTask1 = new Task("do homework",2,1,12);
+        testTask2 = new Task("eat dinner",1,2,14);
     }
 
     @Test
@@ -22,14 +22,14 @@ public class TaskTest {
         assertFalse(testTask1.getDone());
         assertEquals("do homework",testTask1.getName());
         assertEquals(2,testTask1.getLength());
-        assertEquals("10/10/2024",testTask1.getDate());
-        assertEquals("12:00",testTask1.getTime());
+        assertEquals(1,testTask1.getDay());
+        assertEquals(12,testTask1.getTime());
 
         assertFalse(testTask2.getDone());
         assertEquals("eat dinner",testTask2.getName());
         assertEquals(1,testTask2.getLength());
-        assertEquals("10/10/2024",testTask2.getDate());
-        assertEquals("14:00",testTask2.getTime());
+        assertEquals(2,testTask2.getDay());
+        assertEquals(14,testTask2.getTime());
     }
 
     @Test

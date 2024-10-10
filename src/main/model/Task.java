@@ -2,16 +2,16 @@ package model;
 
 
 public class Task {
-    private String date;
+    private int day;
     private String name;
     private int length;
-    private String time;
+    private int time;
     private boolean done;
 
-    public Task(String name, int length, String date, String time) {
+    public Task(String name, int length, int date, int time) {
         this.name = name;
         this.length = length;
-        this.date = date;
+        this.day = date;
         this.time = time;
         this.done = false;
     }
@@ -30,11 +30,11 @@ public class Task {
         return this.length;
     }
 
-    public String getDate(){
-        return this.date;
+    public int getDay(){
+        return this.day;
     }
 
-    public String getTime(){
+    public int getTime(){
         return this.time;
     }
 

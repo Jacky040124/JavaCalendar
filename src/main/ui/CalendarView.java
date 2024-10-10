@@ -2,13 +2,16 @@ package ui;
 import java.util.Scanner;
 import model.ListToDo;
 import model.Task;
+import java.util.HashMap;
 
 public class CalendarView {
     private ListToDo lst;
     private Scanner input;
+    private HashMap<String, String> availability;
 
     // EFFECTS: runs the user interface 
     public CalendarView() {
+        availability = new HashMap<>();
         input = new Scanner(System.in);
         lst = new ListToDo();
         runCalendar();
@@ -42,16 +45,14 @@ public class CalendarView {
     // EFFECTS: prints out list to do in a calendar view 
     public void displayCalendar(ListToDo lst) {
         // TODO: currently hard coded, update to refelct lst content
-        System.out.println("Monday | Tuesday | Wednesday | Thuresday | Friday | Saturday | Sunday");
-        System.out.println("---------------------------------------------------------------------");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
-        System.out.println("       |         |           |           |        |          |       ");
+        System.out.println("Time |Monday    |Tuesday   |Wednesday |Thuresday |Friday    |Saturday  |Sunday    ");
+        System.out.println("----------------------------------------------------------------------------------");
 
+        for (int i = 0; i <= 24; i ++) {
+            System.out.println(String.format("%02d:00|          |          |          |          |          |          |          |", i));
+
+
+        }
     }
 
     // MODIFIES: this
@@ -74,18 +75,26 @@ public class CalendarView {
     }
 
     // MODIFIES: this
-    // EFFECTS: add a task to list
+    // EFFECTS: add a task to list if time available then add time slot to availability, else notify user busy
     public void addingTask() {
+        System.out.println("Input time in the format 16:00, only whole hours");
+        int time = input.nextInt();
         System.out.println("Input task name");
         String name = input.next().toLowerCase();
         System.out.println("Input task length");
         int length = input.nextInt();
-        System.out.println("Input date in the format 25/10/2024");
-        String date = input.next().toLowerCase();
-        System.out.println("Input time in the format 16:00, only whole hours");
-        String time = input.next().toLowerCase();
+        System.out.println("Input weekday in integer form, eg Monday is 1");
+        int date = input.nextInt();
         Task taskToAdd = new Task(name,length,date,time);
-        lst.addTask(taskToAdd);
+
+        if (checkAvailability(taskToAdd)) {
+            addAvailability(taskToAdd);
+            lst.addTask(taskToAdd);
+        } else {
+            System.out.println("time slot is not available");
+        }
+    
+
     }
 
     // REQUIRES: lst.size() > 0
@@ -121,5 +130,20 @@ public class CalendarView {
 
     }
 
+    // EFFECTS: check if time for task is available
+    public boolean checkAvailability(Task task) {
+        for (int i = 0; i < task.getLength(); i++) {
+        }
+        return true;
+    }
+
+    // MODIFIES: availability
+    // EFFECTS: mark time slot as not available
+    public void addAvailability(Task task) {
+        // TODO
+        for (int i = 0; i < task.getLength(); i++) {
+            availability.put(task.getDay()+":"+task.getTime(),task.getName());
+        }
+    }
 
 }

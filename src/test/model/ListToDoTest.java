@@ -12,8 +12,8 @@ public class ListToDoTest {
     
     @BeforeEach
     void runBefore() {
-        testTask1 = new Task("do homework",2,"10/10/2024","12:00");
-        testTask2 = new Task("eat dinner",1,"10/10/2024","14:00");
+        testTask1 = new Task("do homework",2,1,12);
+        testTask2 = new Task("eat dinner",1,2,14);
         testList = new ListToDo();
     }
 
