@@ -9,7 +9,7 @@ public class CalendarView {
     private Scanner input;
     private HashMap<String, String> availability;
 
-    // EFFECTS: runs the user interface 
+    // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
         availability = new HashMap<>();
         input = new Scanner(System.in);
@@ -18,12 +18,12 @@ public class CalendarView {
     }
 
     // MODIFIES: this
-    // EFFECTS: response to the user's input, implementing a user interface
+    // EFFECTS: Continuously accepts user commands until the user chooses to quit.
     private void runCalendar() {
         boolean continueRunning = true;
         String command = null;
         while (continueRunning) {
-            displayCalendar(lst);
+            displayCalendar();
             System.out.println("a : add Task | m : mark task done | r : remove task");
             command = input.next().toLowerCase();
             if (command.equals("q")) {
@@ -35,28 +35,35 @@ public class CalendarView {
         System.out.println("Thank you");
     } 
 
-    // EFFECTS: prints out list to do
+    // EFFECTS: Displays the list of tasks.
     public void displayList() {
         for (int i = 0; i < lst.getList().size();i++ ) {
             System.out.println(i + "|" + lst.getList().get(i).getName());
         }
     }
 
-    // EFFECTS: prints out list to do in a calendar view 
-    public void displayCalendar(ListToDo lst) {
-        // TODO: currently hard coded, update to refelct lst content
+    // EFFECTS: Prints the calendar view with time slots and tasks for each day of the week.
+    public void displayCalendar() {
         System.out.println("Time |Monday    |Tuesday   |Wednesday |Thuresday |Friday    |Saturday  |Sunday    ");
         System.out.println("----------------------------------------------------------------------------------");
 
         for (int i = 0; i <= 24; i ++) {
-            System.out.println(String.format("%02d:00|          |          |          |          |          |          |          |", i));
-
+            String strToPrint = String.format("%02d:00", i);
+            for (int j = 0; j < 7; j++) {
+                String key = Integer.toString(j) +":"+ Integer.toString(i);
+                if (availability.containsKey(key)) {
+                    strToPrint += String.format("|%-10s", availability.get(key)); 
+                } else {
+                    strToPrint += "|          ";
+                }
+            }
+            System.out.println(strToPrint);
 
         }
     }
 
     // MODIFIES: this
-    // EFFECTS: response to user's input
+    // EFFECTS: Executes the user's command, 'a' to add a task, 'm' to mark a task as done, 'r' to remove a task
     public void run(String command) {
         switch (command) {
             case "a":
@@ -75,15 +82,16 @@ public class CalendarView {
     }
 
     // MODIFIES: this
-    // EFFECTS: add a task to list if time available then add time slot to availability, else notify user busy
+    // EFFECTS: Adds a new task to the list and marks its time slots as unavailable if they are free; 
+    //          else, notifies the user time slot is not available.
     public void addingTask() {
-        System.out.println("Input time in the format 16:00, only whole hours");
+        System.out.println("whole number time (16 for 16:00)");
         int time = input.nextInt();
-        System.out.println("Input task name");
+        System.out.println("task name");
         String name = input.next().toLowerCase();
-        System.out.println("Input task length");
+        System.out.println("task length");
         int length = input.nextInt();
-        System.out.println("Input weekday in integer form, eg Monday is 1");
+        System.out.println("Input weekday in integer form, eg Monday is 0");
         int date = input.nextInt();
         Task taskToAdd = new Task(name,length,date,time);
 
@@ -91,15 +99,15 @@ public class CalendarView {
             addAvailability(taskToAdd);
             lst.addTask(taskToAdd);
         } else {
-            System.out.println("time slot is not available");
+            System.out.println("busy");
         }
     
 
     }
 
-    // REQUIRES: lst.size() > 0
+    // REQUIRES: lst is not empty.
     // MODIFIES: this
-    // EFFECTS: remove a task from the list to do
+    // EFFECTS: Removes the specified task from the list based on user input.
     public void removeTask() {
         if (lst.getList().size() == 0){
             System.out.println("Empty");
@@ -114,9 +122,9 @@ public class CalendarView {
 
     }
 
-    // REQUIRES: lst.size() > 0
+    // REQUIRES: lst is not empty.
     // MODIFIES: this
-    // EFFECTS: mark a task in the list as done
+    // EFFECTS: Marks the specified task as completed based on user input.
     public void markTaskDone() {
         if (lst.getList().size() == 0){
             System.out.println("Empty");
@@ -130,19 +138,27 @@ public class CalendarView {
 
     }
 
-    // EFFECTS: check if time for task is available
+    // EFFECTS: Returns true if the specified task's time slots are available; else false.
     public boolean checkAvailability(Task task) {
+        String strDay = Integer.toString(task.getDay());
         for (int i = 0; i < task.getLength(); i++) {
+            String strTime = Integer.toString(task.getTime()+i);
+            if (availability.containsKey(strDay+":"+ strTime)) {
+                return false;
+            }
+
         }
         return true;
     }
 
     // MODIFIES: availability
-    // EFFECTS: mark time slot as not available
+    // EFFECTS: Adds the task's time slots to availability, marking them as unavailable.
     public void addAvailability(Task task) {
-        // TODO
         for (int i = 0; i < task.getLength(); i++) {
-            availability.put(task.getDay()+":"+task.getTime(),task.getName());
+                String strDay = Integer.toString(task.getDay());
+                String strTime = Integer.toString(task.getTime()+i);
+            availability.put(strDay+":"+ strTime,task.getName());
+            System.out.println("availability added" + strDay+":"+ strTime);
         }
     }
 
