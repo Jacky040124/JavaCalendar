@@ -31,6 +31,13 @@ public class ListToDo {
     // EFFECTS: remove a task to the list to do
     public void removeTask(Task task) {
         this.list.remove(task);
+
+        for (int i = 0; i < task.getLength(); i++) {
+            String strDay = Integer.toString(task.getDay());
+            String strTime = Integer.toString(task.getTime() + i);
+            availability.remove(strDay + ":" + strTime);
+        }
+        
     }
 
     public ArrayList<Task> getList() {
