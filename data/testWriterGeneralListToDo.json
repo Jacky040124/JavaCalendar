@@ -1,0 +1,16 @@
+[
+    {
+        "name": "do homework",
+        "length": 2,
+        "time": 12,
+        "day": 1,
+        "done": false
+    },
+    {
+        "name": "eat dinner",
+        "length": 1,
+        "time": 14,
+        "day": 2,
+        "done": false
+    }
+]

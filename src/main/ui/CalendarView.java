@@ -4,18 +4,19 @@ import java.io.IOException;
 import java.util.Scanner;
 import model.ListToDo;
 import model.Task;
-// import persistence.JsonReader;
+import persistence.JsonReader;
 import persistence.JsonWriter;
 
 public class CalendarView {
     private static final String JSON_STORE = "./data/myList.json";
     private JsonWriter jsonWriter;
-    // private JsonReader jsonReader;
+    private JsonReader jsonReader;
     private ListToDo lst;
     private Scanner input;
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
+        jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
         input = new Scanner(System.in);
         lst = new ListToDo();
@@ -186,16 +187,20 @@ public class CalendarView {
         }
     }
 
-    // // MODIFIES: this
-    // // EFFECTS: erase the current list ,load the saved availability from file, and regenerate the list to do
-    // public void loadListToDo() {
-    //     try {
-    //         lst = JsonReader.read();
-    //         System.out.println("Loaded list from " + JSON_STORE);
-    //     } catch (IOException e) {
-    //         System.out.println("Unable to read from file: " + JSON_STORE);
-    //     }
-    // }
+    // MODIFIES: this
+    // EFFECTS: regenerate the list to do and load the saved availability from file
+    public void loadListToDo() {
+        try {
+            lst = jsonReader.read();
+
+            for (Task task : lst.getList()) {
+                addAvailability(task);
+            }
+            System.out.println("Loaded list from " + JSON_STORE);
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: " + JSON_STORE);
+        }
+    }
 
 
 

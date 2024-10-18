@@ -3,7 +3,6 @@ package persistence;
 import model.ListToDo;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 import java.io.*;
 
 // Represents a writer that writes JSON representation of ListToDo to file
@@ -18,11 +17,18 @@ public class JsonWriter {
     }
 
     // MODIFIES: this
-    // EFFECTS: opens writer; throws FileNotFoundException if destination file cannot
-    // be opened for writing
+    // EFFECTS: opens writer; throws FileNotFoundException if destination file cant be opened for writing
     public void open() throws FileNotFoundException {
-        writer = new PrintWriter(new File(destination));
+        File file = new File(destination);
+        
+        // Check if the directory exists, if not, throw an exception
+        if (!file.getParentFile().exists()) {
+            throw new FileNotFoundException("Directory does not exist: ");
+        }
+        
+        writer = new PrintWriter(file);
     }
+    
 
     // MODIFIES: this
     // EFFECTS: writes JSON representation of ListToDo to file
