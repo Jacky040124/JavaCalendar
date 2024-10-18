@@ -44,6 +44,7 @@ public class ListToDo {
     }
 
 
+    // EFFECTS: writes file content to a JSONArray and reuturn it
     public JSONArray toJson() {
         JSONArray jsonLst = new JSONArray();
 

@@ -31,3 +31,8 @@ Well, I am really interested in time management software myself, and I've been u
 - As a user, I want to be able to save my list to do. (if I choose to do so)
 
 - As a user, I want to be able to access the list to do I saved previous everytime I login to the app. (if I choose to do so)
+
+
+## Acknowledgments
+
+Part of this project utilizes codes based on  [JsonSerializationDemo](https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo) provided by CS210.

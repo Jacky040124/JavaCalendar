@@ -86,7 +86,7 @@ public class CalendarView {
                 saveListToDo();
                 break;
             case "l":
-                // loadListToDo();
+                loadListToDo();
                 break;
             default:
                 System.out.println("Invalid Input");
