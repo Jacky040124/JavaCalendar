@@ -53,9 +53,18 @@ public class ListToDo {
         return json;
     }
 
+    // MODIFIES : this
+    // EFFECTS : reset the list
+    public void reset() {
+        this.list = new ArrayList<Task>();
+        this.availability = new HashMap<>();
+    }
+
     public ArrayList<Task> getList() {
         return this.list;
     }
+
+
 
     public HashMap<String, String> getAvailability(){
         return this.availability;

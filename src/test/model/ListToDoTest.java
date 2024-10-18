@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ListToDoTest {
@@ -50,6 +52,15 @@ public class ListToDoTest {
     void testGetAvailability() {
         HashMap<String, String> availability = new HashMap<>();
         assertEquals(availability, testList.getAvailability());
+    }
+
+    @Test
+    void testReset() {
+        testList.addTask(testTask1);
+        testList.addTask(testTask2);
+        testList.reset();
+        assertTrue(testList.getList().isEmpty());
+        assertTrue(testList.getAvailability().isEmpty());
     }
     
 }

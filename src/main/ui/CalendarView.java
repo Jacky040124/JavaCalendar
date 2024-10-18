@@ -189,14 +189,14 @@ public class CalendarView {
 
     // MODIFIES: this
     // EFFECTS: load the saved availability from file, and regenerate the list to do
-    // public void loadListToDo() {
-    //     try {
-    //         workRoom = jsonReader.read();
-    //         System.out.println("Loaded " + workRoom.getName() + " from " + JSON_STORE);
-    //     } catch (IOException e) {
-    //         System.out.println("Unable to read from file: " + JSON_STORE);
-    //     }
-    // }
+    public void loadListToDo() {
+        try {
+            lst = jsonReader.read();
+            System.out.println("Loaded " + workRoom.getName() + " from " + JSON_STORE);
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: " + JSON_STORE);
+        }
+    }
 
 
 }
