@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashMap;
 
 public class ListToDoTest {
     private Task testTask1;
@@ -43,4 +46,11 @@ public class ListToDoTest {
         testList.removeTask(testTask1);
         assertEquals(0,testList.getList().size());
     }
+
+    @Test
+    void testGetAvailability() {
+        HashMap<String, String> availability = new HashMap<>();
+        assertEquals(availability, testList.getAvailability());
+    }
+    
 }
