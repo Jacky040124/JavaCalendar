@@ -8,6 +8,9 @@
 
 // import org.json.*;
 
+// import model.ListToDo;
+// import model.Task;
+
 // // Represents a reader that reads workroom from JSON data stored in file
 // public class JsonReader {
 //     private String source;
@@ -17,9 +20,9 @@
 //         this.source = source;
 //     }
 
-//     // EFFECTS: reads workroom from file and returns it;
+//     // EFFECTS: reads list from file and returns it;
 //     // throws IOException if an error occurs reading data from file
-//     public WorkRoom read() throws IOException {
+//     public ListToDo read() throws IOException {
 //         String jsonData = readFile(source);
 //         JSONObject jsonObject = new JSONObject(jsonData);
 //         return parseWorkRoom(jsonObject);
@@ -36,30 +39,32 @@
 //         return contentBuilder.toString();
 //     }
 
-//     // EFFECTS: parses workroom from JSON object and returns it
-//     private WorkRoom parseWorkRoom(JSONObject jsonObject) {
-//         String name = jsonObject.getString("name");
-//         WorkRoom wr = new WorkRoom(name);
-//         addThingies(wr, jsonObject);
-//         return wr;
+//     // EFFECTS: parses list from JSON object and returns it
+//     private ListToDo parseWorkRoom(JSONObject jsonObject) {
+//         ListToDo lst = new ListToDo();
+//         regenerateLst(lst, jsonObject);
+//         return lst;
 //     }
 
-//     // MODIFIES: wr
-//     // EFFECTS: parses thingies from JSON object and adds them to workroom
-//     private void addThingies(WorkRoom wr, JSONObject jsonObject) {
+//     // TODO stuck here 
+
+//     // MODIFIES: lst
+//     // EFFECTS: parses tasks from JSON object and adds them to list
+//     private void regenerateLst(ListToDo lst, JSONObject jsonObject) {
 //         JSONArray jsonArray = jsonObject.getJSONArray("thingies");
 //         for (Object json : jsonArray) {
-//             JSONObject nextThingy = (JSONObject) json;
-//             addThingy(wr, nextThingy);
+//             JSONObject nextObject = (JSONObject) json;
+//             lst.addTask(nextObject);
 //         }
 //     }
 
-//     // MODIFIES: wr
-//     // EFFECTS: parses thingy from JSON object and adds it to workroom
-//     private void addThingy(WorkRoom wr, JSONObject jsonObject) {
-//         String name = jsonObject.getString("name");
-//         Category category = Category.valueOf(jsonObject.getString("category"));
-//         Thingy thingy = new Thingy(name, category);
-//         wr.addThingy(thingy);
+//     private void regenerateLst(ListToDo lst, JSONObject jsonObject) {
+//         for (String key : jsonObject.keySet()) {
+//             String value = jsonObject.getString(key);
+
+//             Task task = new Task(key, value);
+//             lst.addTask(task);
+//         }
 //     }
+
 // }

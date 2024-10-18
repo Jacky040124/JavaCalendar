@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -43,21 +44,22 @@ public class ListToDo {
         
     }
 
-    public JSONObject toJson() {
-        JSONObject json = new JSONObject();
 
-        for (Map.Entry<String, String> entry : availability.entrySet()) {
-            json.put(entry.getKey(),entry.getValue());
+    public JSONArray toJson() {
+        JSONArray jsonLst = new JSONArray();
+
+        for (int i = 0; i < list.size(); i++) {
+            Task curretnTask = list.get(i);
+            JSONObject jsonTask = new JSONObject();
+            jsonTask.put("name",curretnTask.getName());
+            jsonTask.put("length",curretnTask.getLength());
+            jsonTask.put("day",curretnTask.getDay());
+            jsonTask.put("time",curretnTask.getTime());
+            jsonTask.put("done",curretnTask.getDone());
+            jsonLst.put(jsonTask);
         }
 
-        return json;
-    }
-
-    // MODIFIES : this
-    // EFFECTS : reset the list
-    public void reset() {
-        this.list = new ArrayList<Task>();
-        this.availability = new HashMap<>();
+        return jsonLst;
     }
 
     public ArrayList<Task> getList() {
@@ -66,7 +68,8 @@ public class ListToDo {
 
 
 
-    public HashMap<String, String> getAvailability(){
+    public HashMap<String, String> getAvailability() {
         return this.availability;
     }
+
 }

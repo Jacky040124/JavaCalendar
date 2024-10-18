@@ -1,6 +1,8 @@
 package persistence;
 
 import model.ListToDo;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.*;
 
@@ -25,7 +27,7 @@ public class JsonWriter {
     // MODIFIES: this
     // EFFECTS: writes JSON representation of ListToDo to file
     public void write(ListToDo lst) {
-        JSONObject json = lst.toJson();
+        JSONArray json = lst.toJson();
         saveToFile(json.toString(TAB));
     }
 

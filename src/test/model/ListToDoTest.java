@@ -54,13 +54,5 @@ public class ListToDoTest {
         assertEquals(availability, testList.getAvailability());
     }
 
-    @Test
-    void testReset() {
-        testList.addTask(testTask1);
-        testList.addTask(testTask2);
-        testList.reset();
-        assertTrue(testList.getList().isEmpty());
-        assertTrue(testList.getAvailability().isEmpty());
-    }
     
 }

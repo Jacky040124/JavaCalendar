@@ -170,7 +170,6 @@ public class CalendarView {
                 String strDay = Integer.toString(task.getDay());
                 String strTime = Integer.toString(task.getTime()+i);
                 lst.getAvailability().put(strDay+":"+ strTime,task.getName());
-            System.out.println("availability added" + strDay+":"+ strTime);
         }
     }
 
@@ -187,16 +186,17 @@ public class CalendarView {
         }
     }
 
-    // MODIFIES: this
-    // EFFECTS: load the saved availability from file, and regenerate the list to do
-    public void loadListToDo() {
-        try {
-            lst = jsonReader.read();
-            System.out.println("Loaded " + workRoom.getName() + " from " + JSON_STORE);
-        } catch (IOException e) {
-            System.out.println("Unable to read from file: " + JSON_STORE);
-        }
-    }
+    // // MODIFIES: this
+    // // EFFECTS: erase the current list ,load the saved availability from file, and regenerate the list to do
+    // public void loadListToDo() {
+    //     try {
+    //         lst = JsonReader.read();
+    //         System.out.println("Loaded list from " + JSON_STORE);
+    //     } catch (IOException e) {
+    //         System.out.println("Unable to read from file: " + JSON_STORE);
+    //     }
+    // }
+
 
 
 }
