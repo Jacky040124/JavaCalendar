@@ -1,4 +1,5 @@
 package ui;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
@@ -44,7 +45,7 @@ public class CalendarView {
 
     // EFFECTS: Displays the list of tasks.
     public void displayList() {
-        for (int i = 0; i < lst.getList().size();i++ ) {
+        for (int i = 0; i < lst.getList().size();i++) { 
             System.out.println(i + "|" + lst.getList().get(i).getName());
         }
     }
@@ -54,10 +55,10 @@ public class CalendarView {
         System.out.println("Time |Monday    |Tuesday   |Wednesday |Thuresday |Friday    |Saturday  |Sunday    ");
         System.out.println("----------------------------------------------------------------------------------");
 
-        for (int i = 0; i <= 24; i ++) {
+        for (int i = 0; i <= 24; i++) { 
             String strToPrint = String.format("%02d:00", i);
             for (int j = 0; j < 7; j++) {
-                String key = Integer.toString(j) +":"+ Integer.toString(i);
+                String key = Integer.toString(j) + ":" + Integer.toString(i);
                 if (lst.getAvailability().containsKey(key)) {
                     strToPrint += String.format("|%-10s", lst.getAvailability().get(key)); 
                 } else {
@@ -121,8 +122,8 @@ public class CalendarView {
     // REQUIRES: lst is not empty.
     // MODIFIES: this
     // EFFECTS: Removes the specified task from the list based on user input.
-    public void removeTask() {
-        if (lst.getList().size() == 0){
+    public void removeTask() { 
+        if (lst.getList().size() == 0) {
             System.out.println("Empty");
         } else {
             displayList();
@@ -138,8 +139,8 @@ public class CalendarView {
     // REQUIRES: lst is not empty.
     // MODIFIES: this
     // EFFECTS: Marks the specified task as completed based on user input.
-    public void markTaskDone() {
-        if (lst.getList().size() == 0){
+    public void markTaskDone() { 
+        if (lst.getList().size() == 0) { 
             System.out.println("Empty");
         } else {
             displayList();
@@ -155,8 +156,8 @@ public class CalendarView {
     public boolean checkAvailability(Task task) {
         String strDay = Integer.toString(task.getDay());
         for (int i = 0; i < task.getLength(); i++) {
-            String strTime = Integer.toString(task.getTime()+i);
-            if (lst.getAvailability().containsKey(strDay+":"+ strTime)) {
+            String strTime = Integer.toString(task.getTime() + i);
+            if (lst.getAvailability().containsKey(strDay + ":" + strTime)) {
                 return false;
             }
 
@@ -168,9 +169,9 @@ public class CalendarView {
     // EFFECTS: Adds the task's time slots to availability, marking them as unavailable.
     public void addAvailability(Task task) {
         for (int i = 0; i < task.getLength(); i++) {
-                String strDay = Integer.toString(task.getDay());
-                String strTime = Integer.toString(task.getTime()+i);
-                lst.getAvailability().put(strDay+":"+ strTime,task.getName());
+            String strDay = Integer.toString(task.getDay());
+            String strTime = Integer.toString(task.getTime() + i);
+            lst.getAvailability().put(strDay + ":" + strTime,task.getName());
         }
     }
 

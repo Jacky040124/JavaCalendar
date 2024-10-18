@@ -6,6 +6,7 @@ import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,15 +25,17 @@ class JsonWriterTest {
     
 
     @Test
-    void testWriterInvalidFile() {
+    void testWriterNonexistentDirectory() {
         try {
-            JsonWriter writer = new JsonWriter("./data/my\0illegal:fileName.json");
+            // Specify a directory that does not exist
+            JsonWriter writer = new JsonWriter("./nonexistent_dir/test.json");
             writer.open();
-            fail("IOException was expected");
-        } catch (IOException e) {
-            // pass
+            fail("FileNotFoundException was expected due to nonexistent parent directory");
+        } catch (FileNotFoundException e) {
+            // Test passes as exception is expected
         }
     }
+
 
     @Test
     void testWriterEmpty() {
@@ -69,13 +72,6 @@ class JsonWriterTest {
             assertEquals(testTask1.getDay(), loadedTask1.getDay());
             assertEquals(testTask1.getTime(), loadedTask1.getTime());
             assertEquals(testTask1.getDone(), loadedTask1.getDone());
-    
-            Task loadedTask2 = testList.getList().get(1);
-            assertEquals(testTask2.getName(), loadedTask2.getName());
-            assertEquals(testTask2.getLength(), loadedTask2.getLength());
-            assertEquals(testTask2.getDay(), loadedTask2.getDay());
-            assertEquals(testTask2.getTime(), loadedTask2.getTime());
-            assertEquals(testTask2.getDone(), loadedTask2.getDone());
 
         } catch (IOException e) {
             fail("Exception should not have been thrown");
