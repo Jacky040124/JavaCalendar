@@ -1,17 +1,26 @@
 package ui;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 import model.ListToDo;
 import model.Task;
+// import persistence.JsonReader;
+import persistence.JsonWriter;
 
 public class CalendarView {
+    private static final String JSON_STORE = "./data/myList.json";
+    private JsonWriter jsonWriter;
+    // private JsonReader jsonReader;
     private ListToDo lst;
     private Scanner input;
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
+        jsonWriter = new JsonWriter(JSON_STORE);
         input = new Scanner(System.in);
         lst = new ListToDo();
         runCalendar();
+        
     }
 
     // MODIFIES: this
@@ -21,7 +30,7 @@ public class CalendarView {
         String command = null;
         while (continueRunning) {
             displayCalendar();
-            System.out.println("a : add Task | m : mark task done | r : remove task");
+            System.out.println("a : add Task | m : mark task done | r : remove task | s : save task | l : load task");
             command = input.next().toLowerCase();
             if (command.equals("q")) {
                 continueRunning = false;
@@ -71,6 +80,12 @@ public class CalendarView {
                 break;
             case "r":
                 removeTask();
+                break;
+            case "s":
+                saveListToDo();
+                break;
+            case "l":
+                // loadListToDo();
                 break;
             default:
                 System.out.println("Invalid Input");
@@ -158,5 +173,30 @@ public class CalendarView {
             System.out.println("availability added" + strDay+":"+ strTime);
         }
     }
+
+
+    // EFFECTS: saves the list to file
+    public void saveListToDo() {
+        try {
+            jsonWriter.open();
+            jsonWriter.write(lst);
+            jsonWriter.close();
+            System.out.println("Saved list to" + JSON_STORE);
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + JSON_STORE);
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: load the saved availability from file, and regenerate the list to do
+    // public void loadListToDo() {
+    //     try {
+    //         workRoom = jsonReader.read();
+    //         System.out.println("Loaded " + workRoom.getName() + " from " + JSON_STORE);
+    //     } catch (IOException e) {
+    //         System.out.println("Unable to read from file: " + JSON_STORE);
+    //     }
+    // }
+
 
 }

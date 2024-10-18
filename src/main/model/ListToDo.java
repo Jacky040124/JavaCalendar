@@ -2,6 +2,9 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONObject;
 
 /**
  * Represents a to-do list consisting of a collection of tasks.
@@ -38,6 +41,16 @@ public class ListToDo {
             availability.remove(strDay + ":" + strTime);
         }
         
+    }
+
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+
+        for (Map.Entry<String, String> entry : availability.entrySet()) {
+            json.put(entry.getKey(),entry.getValue());
+        }
+
+        return json;
     }
 
     public ArrayList<Task> getList() {
