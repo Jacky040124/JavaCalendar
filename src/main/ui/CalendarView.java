@@ -38,11 +38,44 @@ public class CalendarView extends JFrame {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
 
+        // Add button panel to the bottom of the frame
+        JPanel buttonPanel = createButtonPanel();
+        add(buttonPanel, BorderLayout.SOUTH);
 
         // Set window properties
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);
+    
+
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        // buttons
+        JButton addButton = new JButton("Add Task");
+        JButton markButton = new JButton("Mark Done");
+        JButton removeButton = new JButton("Remove Task");
+        JButton saveButton = new JButton("Save");
+        JButton loadButton = new JButton("Load");
+
+        // listeners
+        addButton.addActionListener(e -> addingTask());
+        markButton.addActionListener(e -> markTaskDone());
+        removeButton.addActionListener(e -> removeTask());
+        saveButton.addActionListener(e -> saveListToDo());
+        loadButton.addActionListener(e -> loadListToDo());
+
+        // Add buttons to panel
+        buttonPanel.add(addButton);
+        buttonPanel.add(markButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(loadButton);
+
+        return buttonPanel;
     }
 
 
@@ -50,51 +83,18 @@ public class CalendarView extends JFrame {
     // EFFECTS: Adds a new task to the list and marks its time slots as unavailable if they are free; 
     //          else, notifies the user time slot is not available.
     public void addingTask() {
-        System.out.println("whole number time (16 for 16:00)");
-        int time = input.nextInt();
-        System.out.println("task name");
-        String name = input.next().toLowerCase();
-        System.out.println("task length");
-        int length = input.nextInt();
-        System.out.println("Input weekday in integer form, eg Monday is 0");
-        int date = input.nextInt();
-        Task taskToAdd = new Task(name,length,date,time);
-
-        if (checkAvailability(taskToAdd)) {
-            addAvailability(taskToAdd);
-            lst.addTask(taskToAdd);
-        } else {
-            System.out.println("busy");
-        }
     }
 
     // REQUIRES: lst is not empty.
     // MODIFIES: this
     // EFFECTS: Removes the specified task from the list based on user input.
     public void removeTask() { 
-        if (lst.getList().size() == 0) {
-            System.out.println("Empty");
-        } else {
-            int selected = input.nextInt();
-            Task taskSelected = lst.getList().get(selected);
-            lst.removeTask(taskSelected);
-        }
-
-
     }
 
     // REQUIRES: lst is not empty.
     // MODIFIES: this
     // EFFECTS: Marks the specified task as completed based on user input.
     public void markTaskDone() { 
-        if (lst.getList().size() == 0) { 
-            System.out.println("Empty");
-        } else {
-            int selected = input.nextInt();
-            Task taskSelected = lst.getList().get(selected);
-            taskSelected.setDone(true);
-        }
-
     }
 
     // EFFECTS: Returns true if the specified task's time slots are available; else false.
@@ -119,7 +119,6 @@ public class CalendarView extends JFrame {
             lst.getAvailability().put(strDay + ":" + strTime,task.getName());
         }
     }
-
 
     // EFFECTS: saves the list to file
     public void saveListToDo() {
