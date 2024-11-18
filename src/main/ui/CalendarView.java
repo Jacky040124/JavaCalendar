@@ -60,13 +60,32 @@ public class CalendarView {
             for (int j = 0; j < 7; j++) {
                 String key = Integer.toString(j) + ":" + Integer.toString(i);
                 if (lst.getAvailability().containsKey(key)) {
-                    strToPrint += String.format("|%-10s", lst.getAvailability().get(key)); 
+                    String taskName = lst.getAvailability().get(key);
+
+                    boolean isDone = false;
+                    for (Task task : lst.getList()) {
+                        if (task.getName().equals(taskName) && task.getDone()) {
+                            isDone = true;
+                            break;
+                        }
+                    }
+
+                    if (isDone) {
+                        // Create strikethrough effect for completed tasks
+                        String crossedOut = taskName.chars()
+                                .mapToObj(ch -> (char) ch + "\u0336")
+                                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                                .toString();
+                        strToPrint += String.format("|%-10s", crossedOut);
+                    } else {
+                        strToPrint += String.format("|%-10s", taskName);
+                    }
+                    
                 } else {
                     strToPrint += "|          ";
                 }
             }
             System.out.println(strToPrint);
-
         }
     }
 
