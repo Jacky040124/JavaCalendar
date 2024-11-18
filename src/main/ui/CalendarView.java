@@ -2,28 +2,49 @@ package ui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
+
 import model.ListToDo;
 import model.Task;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
-public class CalendarView {
+import javax.swing.*;
+import java.awt.*;
+
+public class CalendarView extends JFrame {
     private static final String JSON_STORE = "./data/myList.json";
+	public static final int WIDTH = 1000;
+	public static final int HEIGHT = 700;
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
     private ListToDo lst;
-    private Scanner input;
+    private JPanel calendarPanel;
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
-        input = new Scanner(System.in);
         lst = new ListToDo();
+        initializeWindow();
         // runCalendar();
         
     }
+
+    // MODIFIES: this
+    // EFFECTS:  draws the JFrame window where the Calendar will operate
+    private void initializeWindow() {
+
+        // LAYOUT : NORTH, SOUTH, EAST, WEST, and CENTER
+        setLayout(new BorderLayout());
+        setMinimumSize(new Dimension(WIDTH, HEIGHT));
+
+
+        // Set window properties
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
 
     // MODIFIES: this
     // EFFECTS: Adds a new task to the list and marks its time slots as unavailable if they are free; 
