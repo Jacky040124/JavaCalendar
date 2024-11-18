@@ -2,173 +2,219 @@ package ui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
+
 import model.ListToDo;
 import model.Task;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
-public class CalendarView {
+import javax.swing.*;
+import java.awt.*;
+
+
+public class CalendarView extends JFrame {
     private static final String JSON_STORE = "./data/myList.json";
+	public static final int WIDTH = 1000;
+	public static final int HEIGHT = 700;
     private JsonWriter jsonWriter;
     private JsonReader jsonReader;
     private ListToDo lst;
-    private Scanner input;
+    private JPanel calendarPanel;
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
         jsonReader = new JsonReader(JSON_STORE);
         jsonWriter = new JsonWriter(JSON_STORE);
-        input = new Scanner(System.in);
         lst = new ListToDo();
-        runCalendar();
-        
+        initializeWindow();
+        createButtonPanel();
+
+        //runCalendar();
     }
 
     // MODIFIES: this
-    // EFFECTS: Continuously accepts user commands until the user chooses to quit.
-    private void runCalendar() {
-        boolean continueRunning = true;
-        String command = null;
-        while (continueRunning) {
-            displayCalendar();
-            System.out.println("a : add Task | m : mark task done | r : remove task | s : save task | l : load task");
-            command = input.next().toLowerCase();
-            if (command.equals("q")) {
-                continueRunning = false;
+    // EFFECTS:  draws the JFrame window where the Calendar will operate
+    private void initializeWindow() {
+
+        // LAYOUT : NORTH, SOUTH, EAST, WEST, and CENTER
+        setLayout(new BorderLayout());
+        setMinimumSize(new Dimension(WIDTH, HEIGHT));
+
+        // Add button panel to the bottom of the frame
+        JPanel buttonPanel = createButtonPanel();
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Set window properties
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        calendarPanel = new JPanel();
+        calendarPanel.setLayout(new BorderLayout());
+        add(calendarPanel, BorderLayout.CENTER);
+        updateCalendarView();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Creates and returns a panel containing all control buttons
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+
+        // buttons
+        JButton addButton = new JButton("Add Task");
+        JButton markButton = new JButton("Mark Done");
+        JButton removeButton = new JButton("Remove Task");
+        JButton saveButton = new JButton("Save");
+        JButton loadButton = new JButton("Load");
+
+        // listeners
+        addButton.addActionListener(e -> addingTask());
+        markButton.addActionListener(e -> markTaskDone());
+        removeButton.addActionListener(e -> removeTask());
+        saveButton.addActionListener(e -> saveListToDo());
+        loadButton.addActionListener(e -> loadListToDo());
+
+        // Add buttons to panel
+        buttonPanel.add(addButton);
+        buttonPanel.add(markButton);
+        buttonPanel.add(removeButton);
+        buttonPanel.add(saveButton);
+        buttonPanel.add(loadButton);
+
+        return buttonPanel;
+    }
+
+
+
+    // MODIFIES: this
+    // EFFECTS: Opens dialog boxes to get task information from user and adds the task if time slots are available
+    private void addingTask() {
+        try {
+            String name = JOptionPane.showInputDialog(this, "Enter task name:");
+            if (name == null) return; // User clicked cancel
+            name = name.toLowerCase();
+
+            String lengthStr = JOptionPane.showInputDialog(this, "Enter task length (hours):");
+            if (lengthStr == null) return;
+            int length = Integer.parseInt(lengthStr);
+
+            int date = getDaySelection();
+            if (date == -1) return; // User closed the dialog without selecting
+
+            String timeStr = JOptionPane.showInputDialog(this, "Enter time (24-hour format, e.g., 16 for 4:00 PM):");
+            if (timeStr == null) return;
+            int time = Integer.parseInt(timeStr);
+
+            Task taskToAdd = new Task(name, length, date, time);
+
+            if (checkAvailability(taskToAdd)) {
+                addAvailability(taskToAdd);
+                lst.addTask(taskToAdd);
+                JOptionPane.showMessageDialog(this, "Task added successfully!");
             } else {
-                run(command);
+                JOptionPane.showMessageDialog(this, "Time slot is not available!", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numbers!", 
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
-        System.out.println("Thank you");
-    } 
-
-    // EFFECTS: Displays the list of tasks.
-    public void displayList() {
-        for (int i = 0; i < lst.getList().size();i++) { 
-            System.out.println(i + "|" + lst.getList().get(i).getName());
-        }
+        updateCalendarView();
     }
 
-    // EFFECTS: Prints the calendar view with time slots and tasks for each day of the week.
-    public void displayCalendar() {
-        System.out.println("Time |Monday    |Tuesday   |Wednesday |Thuresday |Friday    |Saturday  |Sunday    ");
-        System.out.println("----------------------------------------------------------------------------------");
+    // REQUIRES: lst is not empty
+    // MODIFIES: this
+    // EFFECTS: Shows list of tasks and allows user to mark one as done
+    private void markTaskDone() {
+        if (lst.getList().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No tasks to mark!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-        for (int i = 0; i <= 24; i++) { 
-            String strToPrint = String.format("%02d:00", i);
-            for (int j = 0; j < 7; j++) {
-                String key = Integer.toString(j) + ":" + Integer.toString(i);
-                if (lst.getAvailability().containsKey(key)) {
-                    String taskName = lst.getAvailability().get(key);
+        String[] options = createTaskArray();
+        int choice = JOptionPane.showOptionDialog(this,
+                "Select task to mark as done:",
+                "Mark Task Done",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
 
-                    boolean isDone = false;
-                    for (Task task : lst.getList()) {
-                        if (task.getName().equals(taskName) && task.getDone()) {
-                            isDone = true;
-                            break;
-                        }
-                    }
+        if (choice >= 0) {
+            lst.getList().get(choice).setDone(true);
+            JOptionPane.showMessageDialog(this, "Task marked as done!");
+        }
+        updateCalendarView();
+    }
 
-                    if (isDone) {
-                        // Create strikethrough effect for completed tasks
-                        String crossedOut = taskName.chars()
-                                .mapToObj(ch -> (char) ch + "\u0336")
-                                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-                                .toString();
-                        strToPrint += String.format("|%-10s", crossedOut);
-                    } else {
-                        strToPrint += String.format("|%-10s", taskName);
-                    }
-                    
-                } else {
-                    strToPrint += "|          ";
-                }
+    // REQUIRES: lst is not empty
+    // MODIFIES: this
+    // EFFECTS: Shows list of tasks and allows user to remove one
+    private void removeTask() {
+        if (lst.getList().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No tasks to remove!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String[] options = createTaskArray();
+        int choice = JOptionPane.showOptionDialog(this,
+                "Select task to remove:",
+                "Remove Task",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        if (choice >= 0) {
+            Task taskToRemove = lst.getList().get(choice);
+            lst.removeTask(taskToRemove);
+            JOptionPane.showMessageDialog(this, "Task removed successfully!");
+        }
+        updateCalendarView();
+    }
+
+    // EFFECTS: Creates an array of task descriptions for display in dialog boxes
+    private String[] createTaskArray() {
+        String[] options = new String[lst.getList().size()];
+        for (int i = 0; i < lst.getList().size(); i++) {
+            Task task = lst.getList().get(i);
+            options[i] = String.format("%s (Day: %d, Time: %d, Length: %d)", 
+                task.getName(), task.getDay(), task.getTime(), task.getLength());
+        }
+        return options;
+    }
+
+    // EFFECTS: saves the list to file with visual feedback
+    private void saveListToDo() {
+        try {
+            jsonWriter.open();
+            jsonWriter.write(lst);
+            jsonWriter.close();
+            JOptionPane.showMessageDialog(this, "Saved list to " + JSON_STORE);
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, "Unable to write to file: " + JSON_STORE,
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        updateCalendarView();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: loads the list from file with visual feedback
+    private void loadListToDo() {
+        try {
+            lst = jsonReader.read();
+            for (Task task : lst.getList()) {
+                addAvailability(task);
             }
-            System.out.println(strToPrint);
+            JOptionPane.showMessageDialog(this, "Loaded list from " + JSON_STORE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Unable to read from file: " + JSON_STORE,
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Executes the user's command, 'a' to add a task, 'm' to mark a task as done, 'r' to remove a task
-    public void run(String command) {
-        switch (command) {
-            case "a":
-                addingTask();
-                break;
-            case "m":
-                markTaskDone();
-                break;
-            case "r":
-                removeTask();
-                break;
-            case "s":
-                saveListToDo();
-                break;
-            case "l":
-                loadListToDo();
-                break;
-            default:
-                System.out.println("Invalid Input");
-                break;
-        }
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Adds a new task to the list and marks its time slots as unavailable if they are free; 
-    //          else, notifies the user time slot is not available.
-    public void addingTask() {
-        System.out.println("whole number time (16 for 16:00)");
-        int time = input.nextInt();
-        System.out.println("task name");
-        String name = input.next().toLowerCase();
-        System.out.println("task length");
-        int length = input.nextInt();
-        System.out.println("Input weekday in integer form, eg Monday is 0");
-        int date = input.nextInt();
-        Task taskToAdd = new Task(name,length,date,time);
-
-        if (checkAvailability(taskToAdd)) {
-            addAvailability(taskToAdd);
-            lst.addTask(taskToAdd);
-        } else {
-            System.out.println("busy");
-        }
-    
-
-    }
-
-    // REQUIRES: lst is not empty.
-    // MODIFIES: this
-    // EFFECTS: Removes the specified task from the list based on user input.
-    public void removeTask() { 
-        if (lst.getList().size() == 0) {
-            System.out.println("Empty");
-        } else {
-            displayList();
-            System.out.println("Select by index");
-            int selected = input.nextInt();
-            Task taskSelected = lst.getList().get(selected);
-            lst.removeTask(taskSelected);
-        }
-
-
-    }
-
-    // REQUIRES: lst is not empty.
-    // MODIFIES: this
-    // EFFECTS: Marks the specified task as completed based on user input.
-    public void markTaskDone() { 
-        if (lst.getList().size() == 0) { 
-            System.out.println("Empty");
-        } else {
-            displayList();
-            System.out.println("Select by index");
-            int selected = input.nextInt();
-            Task taskSelected = lst.getList().get(selected);
-            taskSelected.setDone(true);
-        }
-
+        updateCalendarView();
     }
 
     // EFFECTS: Returns true if the specified task's time slots are available; else false.
@@ -192,36 +238,85 @@ public class CalendarView {
             String strTime = Integer.toString(task.getTime() + i);
             lst.getAvailability().put(strDay + ":" + strTime,task.getName());
         }
-    }
-
-
-    // EFFECTS: saves the list to file
-    public void saveListToDo() {
-        try {
-            jsonWriter.open();
-            jsonWriter.write(lst);
-            jsonWriter.close();
-            System.out.println("Saved list to" + JSON_STORE);
-        } catch (FileNotFoundException e) {
-            System.out.println("Unable to write to file: " + JSON_STORE);
-        }
+        updateCalendarView();
     }
 
     // MODIFIES: this
-    // EFFECTS: regenerate the list to do and load the saved availability from file
-    public void loadListToDo() {
-        try {
-            lst = jsonReader.read();
+    // EFFECTS: Updates the calendar view with current tasks
+    private void updateCalendarView() {
+        calendarPanel.removeAll(); // Clear existing components
 
-            for (Task task : lst.getList()) {
-                addAvailability(task);
+        // Create table model with 25 rows (hours) and 8 columns (time + 7 days)
+        String[] columnNames = {"Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        String[][] data = new String[24][8];
+
+        // Fill time column
+        for (int i = 0; i < 24; i++) {
+            data[i][0] = String.format("%02d:00", i);
+            for (int j = 1; j < 8; j++) {
+                String key = (j - 1) + ":" + i;
+                if (lst.getAvailability().containsKey(key)) {
+                    String taskName = lst.getAvailability().get(key);
+                    boolean isDone = false;
+                    for (Task task : lst.getList()) {
+                        if (task.getName().equals(taskName) && task.getDone()) {
+                            isDone = true;
+                            break;
+                        }
+                    }
+                    data[i][j] = isDone ? "✓ " + taskName : taskName;
+                } else {
+                    data[i][j] = "";
+                }
             }
-            System.out.println("Loaded list from " + JSON_STORE);
-        } catch (IOException e) {
-            System.out.println("Unable to read from file: " + JSON_STORE);
         }
+
+        // Create table with custom renderer
+        JTable calendarTable = new JTable(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        // Customize table appearance
+        calendarTable.setRowHeight(30);
+        calendarTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+        for (int i = 1; i < 8; i++) {
+            calendarTable.getColumnModel().getColumn(i).setPreferredWidth(120);
+        }
+
+        // Add table to a scroll pane
+        JScrollPane scrollPane = new JScrollPane(calendarTable);
+        calendarPanel.add(scrollPane, BorderLayout.CENTER);
+        calendarPanel.revalidate();
+        calendarPanel.repaint();
     }
 
+    // EFFECTS: Shows a dialog with day selection buttons and returns the selected day (0-6)
+    private int getDaySelection() {
+        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        final int[] selectedDay = {-1};
 
+        for (int i = 0; i < days.length; i++) {
+            final int day = i;
+            JButton dayButton = new JButton(days[i]);
+            dayButton.addActionListener(e -> {
+                selectedDay[0] = day;
+                Window dialog = SwingUtilities.getWindowAncestor((JButton) e.getSource());
+                dialog.dispose();
+            });
+            panel.add(dayButton);
+        }
+
+        JDialog dialog = new JDialog(this, "Select Day", true);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+
+        return selectedDay[0];
+    }
 
 }

@@ -2,22 +2,15 @@
     {
         "name": "shower",
         "length": 2,
-        "time": 16,
+        "time": 10,
         "day": 0,
-        "done": false
+        "done": true
     },
     {
         "name": "math",
-        "length": 2,
-        "time": 17,
-        "day": 1,
-        "done": false
-    },
-    {
-        "name": "run",
-        "length": 5,
-        "time": 18,
-        "day": 5,
-        "done": false
+        "length": 3,
+        "time": 10,
+        "day": 4,
+        "done": true
     }
 ]
