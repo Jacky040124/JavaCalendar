@@ -10,8 +10,11 @@ import persistence.JsonWriter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 
-
+// EFFECTS: Create a calendarView and provides GUI
 public class CalendarView extends JFrame {
     private static final String JSON_STORE = "./data/myList.json";
 	public static final int WIDTH = 1000;
@@ -20,6 +23,8 @@ public class CalendarView extends JFrame {
     private JsonReader jsonReader;
     private ListToDo lst;
     private JPanel calendarPanel;
+    private JPanel mainPanel;
+    
 
     // EFFECTS: Initializes the CalendarView object and runs the user interface.
     public CalendarView() {
@@ -27,32 +32,39 @@ public class CalendarView extends JFrame {
         jsonWriter = new JsonWriter(JSON_STORE);
         lst = new ListToDo();
         initializeWindow();
-        createButtonPanel();
-
-        //runCalendar();
+        
+        // Add calendar panel
+        calendarPanel = new JPanel(new BorderLayout());
+        mainPanel.add(calendarPanel, BorderLayout.CENTER);
+        
+        // Add button panel at the bottom
+        JPanel buttonPanel = createButtonPanel();
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        
+        updateCalendarView();
     }
 
     // MODIFIES: this
     // EFFECTS:  draws the JFrame window where the Calendar will operate
     private void initializeWindow() {
-
-        // LAYOUT : NORTH, SOUTH, EAST, WEST, and CENTER
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
-
-        // Add button panel to the bottom of the frame
-        JPanel buttonPanel = createButtonPanel();
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        // Set window properties
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        
+        // Add icon to the title bar
+        setIconImage(getIcon().getImage());
+        
+        // Create a panel for the icon in the top-right corner
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JLabel iconLabel = new JLabel(getIcon());
+        iconPanel.add(iconLabel);
+        
+        mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(iconPanel, BorderLayout.NORTH);
+        add(mainPanel);
+        
         setVisible(true);
-
-        calendarPanel = new JPanel();
-        calendarPanel.setLayout(new BorderLayout());
-        add(calendarPanel, BorderLayout.CENTER);
-        updateCalendarView();
     }
 
     // MODIFIES: this
@@ -87,8 +99,9 @@ public class CalendarView extends JFrame {
 
 
 
+    // REQUIRES: task name not null, length > 0, time between 0-23
     // MODIFIES: this
-    // EFFECTS: Opens dialog boxes to get task information from user and adds the task if time slots are available
+    // EFFECTS: Adds task to calendar if time slot available
     private void addingTask() {
         try {
             String name = JOptionPane.showInputDialog(this, "Enter task name:");
@@ -123,9 +136,9 @@ public class CalendarView extends JFrame {
         updateCalendarView();
     }
 
-    // REQUIRES: lst is not empty
+    // REQUIRES: lst not empty
     // MODIFIES: this
-    // EFFECTS: Shows list of tasks and allows user to mark one as done
+    // EFFECTS: Marks selected task as done
     private void markTaskDone() {
         if (lst.getList().isEmpty()) {
             JOptionPane.showMessageDialog(this, "No tasks to mark!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -149,9 +162,9 @@ public class CalendarView extends JFrame {
         updateCalendarView();
     }
 
-    // REQUIRES: lst is not empty
+    // REQUIRES: lst not empty
     // MODIFIES: this
-    // EFFECTS: Shows list of tasks and allows user to remove one
+    // EFFECTS: Removes selected task from calendar
     private void removeTask() {
         if (lst.getList().isEmpty()) {
             JOptionPane.showMessageDialog(this, "No tasks to remove!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -176,18 +189,18 @@ public class CalendarView extends JFrame {
         updateCalendarView();
     }
 
-    // EFFECTS: Creates an array of task descriptions for display in dialog boxes
+    // EFFECTS: Returns array of task descriptions
     private String[] createTaskArray() {
-        String[] options = new String[lst.getList().size()];
-        for (int i = 0; i < lst.getList().size(); i++) {
-            Task task = lst.getList().get(i);
-            options[i] = String.format("%s (Day: %d, Time: %d, Length: %d)", 
-                task.getName(), task.getDay(), task.getTime(), task.getLength());
+        List<String> options = new ArrayList<>();
+        for (Task task : lst.getList()) {
+            options.add(String.format("%s (Day: %d, Time: %d, Length: %d)", 
+                task.getName(), task.getDay(), task.getTime(), task.getLength()));
         }
-        return options;
+        return options.toArray(new String[0]);
     }
 
-    // EFFECTS: saves the list to file with visual feedback
+    // MODIFIES: JSON_STORE
+    // EFFECTS: Saves current list to file
     private void saveListToDo() {
         try {
             jsonWriter.open();
@@ -202,7 +215,7 @@ public class CalendarView extends JFrame {
     }
 
     // MODIFIES: this
-    // EFFECTS: loads the list from file with visual feedback
+    // EFFECTS: Loads list from file and updates calendar
     private void loadListToDo() {
         try {
             lst = jsonReader.read();
@@ -217,7 +230,8 @@ public class CalendarView extends JFrame {
         updateCalendarView();
     }
 
-    // EFFECTS: Returns true if the specified task's time slots are available; else false.
+    // REQUIRES: task not null
+    // EFFECTS: Returns true if task's time slots are available
     public boolean checkAvailability(Task task) {
         String strDay = Integer.toString(task.getDay());
         for (int i = 0; i < task.getLength(); i++) {
@@ -230,8 +244,9 @@ public class CalendarView extends JFrame {
         return true;
     }
 
-    // MODIFIES: availability
-    // EFFECTS: Adds the task's time slots to availability, marking them as unavailable.
+    // REQUIRES: task not null
+    // MODIFIES: this
+    // EFFECTS: Marks task's time slots as unavailable
     public void addAvailability(Task task) {
         for (int i = 0; i < task.getLength(); i++) {
             String strDay = Integer.toString(task.getDay());
@@ -242,12 +257,14 @@ public class CalendarView extends JFrame {
     }
 
     // MODIFIES: this
-    // EFFECTS: Updates the calendar view with current tasks
+    // EFFECTS: Refreshes calendar display with current tasks
     private void updateCalendarView() {
-        calendarPanel.removeAll(); // Clear existing components
+        calendarPanel.removeAll();
 
-        // Create table model with 25 rows (hours) and 8 columns (time + 7 days)
-        String[] columnNames = {"Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        // Create table model
+        List<String> columnNamesList = Arrays.asList("Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+        // just to make JTable work
+        String[] columnNames = columnNamesList.toArray(new String[0]);
         String[][] data = new String[24][8];
 
         // Fill time column
@@ -271,7 +288,7 @@ public class CalendarView extends JFrame {
             }
         }
 
-        // Create table with custom renderer
+        // Create table
         JTable calendarTable = new JTable(data, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -279,7 +296,7 @@ public class CalendarView extends JFrame {
             }
         };
 
-        // Customize table appearance
+        // appearance
         calendarTable.setRowHeight(30);
         calendarTable.getColumnModel().getColumn(0).setPreferredWidth(50);
         for (int i = 1; i < 8; i++) {
@@ -293,30 +310,26 @@ public class CalendarView extends JFrame {
         calendarPanel.repaint();
     }
 
-    // EFFECTS: Shows a dialog with day selection buttons and returns the selected day (0-6)
+    // EFFECTS: returns selected day (0-6)
     private int getDaySelection() {
-        JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
-        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-        final int[] selectedDay = {-1};
-
-        for (int i = 0; i < days.length; i++) {
-            final int day = i;
-            JButton dayButton = new JButton(days[i]);
-            dayButton.addActionListener(e -> {
-                selectedDay[0] = day;
-                Window dialog = SwingUtilities.getWindowAncestor((JButton) e.getSource());
-                dialog.dispose();
-            });
-            panel.add(dayButton);
+        String input = JOptionPane.showInputDialog(this, 
+            "Enter day number:\n0: Monday\n1: Tuesday\n2: Wednesday\n3: Thursday\n4: Friday\n5: Saturday\n6: Sunday");
+        
+        try {
+            if (input == null) return -1;
+            int day = Integer.parseInt(input);
+            return (day >= 0 && day <= 6) ? day : -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
-
-        JDialog dialog = new JDialog(this, "Select Day", true);
-        dialog.add(panel);
-        dialog.pack();
-        dialog.setLocationRelativeTo(this);
-        dialog.setVisible(true);
-
-        return selectedDay[0];
+    }
+    
+    private ImageIcon getIcon() {
+        ImageIcon icon = new ImageIcon("CalendarLogo.png");
+        Image image = icon.getImage();
+        Image resizedImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(resizedImage);
+        return icon;
     }
 
 }

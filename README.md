@@ -32,7 +32,36 @@ Well, I am really interested in time management software myself, and I've been u
 
 - As a user, I want to be able to access the list to do I saved previous everytime I login to the app. (if I choose to do so)
 
+## User Instructions
+
+### Managing Tasks
+- To add a task:
+  1. Click Add
+  2. Enter name
+  3. Enter length in hours 
+  4. Enter day number (0-6 0 is monday)
+  5. Enter time (24-hour format)
+
+- To mark a task as done:
+  1. Click Mark Done button
+  2. Select task
+  3. Task will appear with a ✓ if sucessful
+
+- To remove a task:
+  1. Click remove button
+  2. Select task to remove
+
+### Visual Component
+The calendar logo appears in the top-right corner.
+
+### Saving and Loading
+- To save your current tasks:
+  1. Click "Save" button
+  2. Your tasks will be saved
+
+- To load previously saved tasks:
+  1. Click "Load" button
+  2. Your previously saved tasks will be restored
 
 ## Acknowledgments
-
 Part of this project utilizes codes based on  [JsonSerializationDemo](https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo) provided by CS210.
