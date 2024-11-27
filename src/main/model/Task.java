@@ -22,8 +22,8 @@ public class Task {
     }
     
     // MODIFIES: this
-    // EFFECTS: chnage the state of Done, either to true or false
-    public void setDone(boolean state){
+    // EFFECTS: change the state of Done, either to true or false
+    public void setDone(boolean state) {
         this.done = state;
     }
 

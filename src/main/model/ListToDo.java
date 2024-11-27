@@ -19,6 +19,7 @@ public class ListToDo {
     public ListToDo() {
         this.list = new ArrayList<Task>();
         this.availability = new HashMap<>();
+        
     }
 
 
@@ -27,6 +28,9 @@ public class ListToDo {
     // EFFECTS: add a task to the list to do, if duplicated add anyway
     public void addTask(Task task) {
         this.list.add(task);
+        Event e = new Event("Task " + task.getName() + " added to calendar.");
+        EventLog.getInstance().logEvent(e);
+        System.out.println(e.toString());
     }
 
     // REQUIRES: task.done != true
@@ -40,7 +44,9 @@ public class ListToDo {
             String strTime = Integer.toString(task.getTime() + i);
             availability.remove(strDay + ":" + strTime);
         }
-        
+        Event e = new Event("Task " + task.getName() + " removed from calendar.");
+        EventLog.getInstance().logEvent(e);
+        System.out.println(e.toString());
     }
 
 

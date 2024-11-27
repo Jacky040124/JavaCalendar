@@ -1,16 +1,16 @@
 [
     {
-        "name": "shower",
-        "length": 3,
-        "time": 2,
-        "day": 2,
-        "done": true
-    },
-    {
-        "name": "math",
+        "name": "cook",
         "length": 3,
         "time": 10,
-        "day": 3,
+        "day": 4,
+        "done": false
+    },
+    {
+        "name": "shower",
+        "length": 2,
+        "time": 12,
+        "day": 1,
         "done": false
     }
 ]
