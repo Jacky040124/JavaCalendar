@@ -63,5 +63,8 @@ The calendar logo appears in the top-right corner.
   1. Click "Load" button
   2. Your previously saved tasks will be restored
 
+### Possbile Refactoring to improve
+Have a seperate class call ErrorHandle to centralise error handling thus makes the program more robust and maintainable. 
+
 ## Acknowledgments
 Part of this project utilizes codes based on  [JsonSerializationDemo](https://github.students.cs.ubc.ca/CPSC210/JsonSerializationDemo) provided by CS210.
