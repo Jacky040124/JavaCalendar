@@ -13,6 +13,14 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import model.Event;
+import model.EventLog;
+
+// Iterator<Event> iterator = events.iterator();
+// Event latest = new Event("");
+// while (iterator.hasNext()) {
+//     System.out.println(latest.toString());
+// }
 
 // EFFECTS: Create a calendarView and provides GUI
 public class CalendarView extends JFrame {
@@ -50,7 +58,14 @@ public class CalendarView extends JFrame {
     private void initializeWindow() {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                printLog();
+                System.exit(0);
+            }
+        });
         setLocationRelativeTo(null);
         setIconImage(getIcon().getImage());
         setupIconPanel();
@@ -295,6 +310,7 @@ public class CalendarView extends JFrame {
         addTableToPanel(calendarTable);
     }
 
+    // EFFECTS: Creates and returns table data structure for calendar display
     private String[][] createTableData() {
         List<String> cols = Arrays.asList("Time", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
         String[] columnNames = cols.toArray(new String[0]);
@@ -303,6 +319,8 @@ public class CalendarView extends JFrame {
         return data;
     }
 
+    // MODIFIES: data
+    // EFFECTS: fills time column (0-23) in data array
     private void fillTimeData(String[][] data) {
         for (int i = 0; i < 24; i++) {
             data[i][0] = String.format("%02d:00", i);
@@ -310,6 +328,8 @@ public class CalendarView extends JFrame {
         }
     }
 
+    // MODIFIES: data
+    // EFFECTS: fills task data for each day in the given row
     private void fillRowData(String[][] data, int row) {
         for (int j = 1; j < 8; j++) {
             String key = (j - 1) + ":" + row;
@@ -317,6 +337,7 @@ public class CalendarView extends JFrame {
         }
     }
 
+    // EFFECTS: returns task display string for given time slot, with checkmark if task is done
     private String getTaskDisplay(String key) {
         if (lst.getAvailability().containsKey(key)) {
             String taskName = lst.getAvailability().get(key);
@@ -325,6 +346,7 @@ public class CalendarView extends JFrame {
         return "";
     }
 
+    // EFFECTS: returns true if task with given name is marked as done
     private boolean isTaskDone(String taskName) {
         for (Task task : lst.getList()) {
             if (task.getName().equals(taskName) && task.getDone()) {
@@ -334,6 +356,7 @@ public class CalendarView extends JFrame {
         return false;
     }
 
+    // EFFECTS: creates and returns non-editable calendar table with given data
     private JTable createCalendarTable(String[][] data) {
         List<String> cols = Arrays.asList("Time", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
         return new JTable(data, cols.toArray(new String[0])) {
@@ -344,6 +367,8 @@ public class CalendarView extends JFrame {
         };
     }
 
+    // MODIFIES: table
+    // EFFECTS: sets up table appearance including row heights and column widths
     private void setupTableAppearance(JTable table) {
         table.setRowHeight(30);
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -352,6 +377,8 @@ public class CalendarView extends JFrame {
         }
     }
 
+    // MODIFIES: calendarPanel
+    // EFFECTS: adds table to panel with scroll functionality
     private void addTableToPanel(JTable table) {
         JScrollPane scrollPane = new JScrollPane(table);
         calendarPanel.add(scrollPane, BorderLayout.CENTER);
@@ -381,6 +408,14 @@ public class CalendarView extends JFrame {
         Image resizedImage = image.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         icon = new ImageIcon(resizedImage);
         return icon;
+    }
+
+    private void printLog() {
+        EventLog eventLog = EventLog.getInstance();
+        for (Event event : eventLog) {
+            System.out.println(event.toString() + "\n");
+        }
+        eventLog.clear();
     }
 
 }

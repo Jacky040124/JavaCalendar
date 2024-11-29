@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,6 +15,7 @@ public class ListToDo {
     private ArrayList<Task> list;
     private HashMap<String, String> availability;
 
+    // EFFECTS: creates a new empty list of tasks and initializes availability hashmap
     public ListToDo() {
         this.list = new ArrayList<Task>();
         this.availability = new HashMap<>();
@@ -28,9 +28,10 @@ public class ListToDo {
     // EFFECTS: add a task to the list to do, if duplicated add anyway
     public void addTask(Task task) {
         this.list.add(task);
-        Event e = new Event("Task " + task.getName() + " added to calendar.");
-        EventLog.getInstance().logEvent(e);
-        System.out.println(e.toString());
+
+        EventLog events = EventLog.getInstance();
+        events.logEvent(new Event("Task " + task.getName() + " added from calendar."));
+     
     }
 
     // REQUIRES: task.done != true
@@ -44,9 +45,9 @@ public class ListToDo {
             String strTime = Integer.toString(task.getTime() + i);
             availability.remove(strDay + ":" + strTime);
         }
-        Event e = new Event("Task " + task.getName() + " removed from calendar.");
-        EventLog.getInstance().logEvent(e);
-        System.out.println(e.toString());
+        EventLog events = EventLog.getInstance();
+        events.logEvent(new Event("Task " + task.getName() + " removed from calendar."));
+
     }
 
 
@@ -68,14 +69,17 @@ public class ListToDo {
         return jsonLst;
     }
 
+    // EFFECTS: returns the list of tasks
     public ArrayList<Task> getList() {
         return this.list;
     }
 
 
 
+    // EFFECTS: returns the availability hashmap of time slots
     public HashMap<String, String> getAvailability() {
         return this.availability;
     }
+
 
 }
