@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import model.ListToDo;
 import model.Task;
+import model.TimeConverter;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
@@ -98,16 +99,18 @@ public class CalendarView extends JFrame {
         JButton addButton = new JButton("Add Task");
         JButton markButton = new JButton("Mark Done");
         JButton removeButton = new JButton("Remove Task");
+        JButton timeCalcButton = new JButton("Time Calculator");
         JButton saveButton = new JButton("Save");
         JButton loadButton = new JButton("Load");
 
         addButton.addActionListener(e -> addingTask());
         markButton.addActionListener(e -> markTaskDone());
         removeButton.addActionListener(e -> removeTask());
+        timeCalcButton.addActionListener(e -> showTimeCalculator());
         saveButton.addActionListener(e -> saveListToDo());
         loadButton.addActionListener(e -> loadListToDo());
 
-        addButtonsToPanel(buttonPanel, addButton, markButton, removeButton, saveButton, loadButton);
+        addButtonsToPanel(buttonPanel, addButton, markButton, removeButton, timeCalcButton, saveButton, loadButton);
     }
 
     // MODIFIES: buttonPanel
@@ -156,12 +159,23 @@ public class CalendarView extends JFrame {
             return;
         }
 
-        String timePrompt = "Enter time (24h format, e.g., 16 for 4PM):";
+        String timePrompt = "Enter time (you can use):\n" +
+                           "• 24h format: 16 (for 4PM)\n" +
+                           "• 12h format: 4 PM, 2:00 PM\n" +
+                           "• HH:MM format: 14:00";
         String timeStr = JOptionPane.showInputDialog(this, timePrompt);
         if (timeStr == null) {
             return;
         }
-        int time = Integer.parseInt(timeStr);
+        
+        int time;
+        try {
+            time = TimeConverter.parseTimeInput(timeStr);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Invalid time format: " + e.getMessage(), 
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         addTaskIfAvailable(new Task(name, length, date, time));
     }
@@ -236,8 +250,11 @@ public class CalendarView extends JFrame {
     private String[] createTaskArray() {
         List<String> options = new ArrayList<>();
         for (Task task : lst.getList()) {
-            String taskInfo = String.format("%s (D:%d T:%d L:%d)", 
-                    task.getName(), task.getDay(), task.getTime(), task.getLength());
+            String dayName = task.getDayName();
+            String timeRange = task.getTimeRange(true); // Use 12-hour format for display
+            String status = task.getDone() ? "✓ " : "";
+            String taskInfo = String.format("%s%s - %s (%s, %s)", 
+                    status, task.getName(), timeRange, dayName, task.getLength() + "h");
             options.add(taskInfo);
         }
         return options.toArray(new String[0]);
@@ -323,7 +340,10 @@ public class CalendarView extends JFrame {
     // EFFECTS: fills time column (0-23) in data array
     private void fillTimeData(String[][] data) {
         for (int i = 0; i < 24; i++) {
-            data[i][0] = String.format("%02d:00", i);
+            // Show both 24-hour and 12-hour formats for better readability
+            String time24 = String.format("%02d:00", i);
+            String time12 = TimeConverter.to12HourFormat(i);
+            data[i][0] = time24 + " (" + time12 + ")";
             fillRowData(data, i);
         }
     }
@@ -388,18 +408,17 @@ public class CalendarView extends JFrame {
 
     // EFFECTS: returns selected day (0-6)
     private int getDaySelection() {
-        String msg = "Enter day (0:Mon-6:Sun):";
-        String input = JOptionPane.showInputDialog(this, msg);
+        String[] dayOptions = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "Select day for the task:",
+                "Day Selection",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                dayOptions,
+                dayOptions[0]);
         
-        try {
-            if (input == null) {
-                return -1;
-            }
-            int day = Integer.parseInt(input);
-            return (day >= 0 && day <= 6) ? day : -1;
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        return choice;
     }
     
     private ImageIcon getIcon() {
@@ -416,6 +435,158 @@ public class CalendarView extends JFrame {
             System.out.println(event.toString() + "\n");
         }
         eventLog.clear();
+    }
+
+    // EFFECTS: Shows time calculator interface
+    private void showTimeCalculator() {
+        String[] options = {"Convert 12h to 24h", "Convert 24h to 12h", "Calculate End Time", "Check Time Overlap"};
+        int choice = JOptionPane.showOptionDialog(this,
+                "Select time calculation:",
+                "Time Calculator",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+        
+        switch (choice) {
+            case 0:
+                convert12To24();
+                break;
+            case 1:
+                convert24To12();
+                break;
+            case 2:
+                calculateEndTime();
+                break;
+            case 3:
+                checkTimeOverlap();
+                break;
+        }
+    }
+    
+    // EFFECTS: Converts 12-hour time to 24-hour format
+    private void convert12To24() {
+        String input = JOptionPane.showInputDialog(this, 
+            "Enter time in 12-hour format (e.g., '2:00 PM', '10 AM'):");
+        if (input == null) return;
+        
+        try {
+            int hour24 = TimeConverter.to24HourFormat(input);
+            String result = String.format("%s = %02d:00 (%d)", input, hour24, hour24);
+            JOptionPane.showMessageDialog(this, result, "12h to 24h Conversion", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), 
+                                        "Conversion Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // EFFECTS: Converts 24-hour time to 12-hour format
+    private void convert24To12() {
+        String input = JOptionPane.showInputDialog(this, 
+            "Enter hour (0-23):");
+        if (input == null) return;
+        
+        try {
+            int hour = Integer.parseInt(input);
+            if (hour < 0 || hour > 23) {
+                throw new IllegalArgumentException("Hour must be between 0 and 23");
+            }
+            String result = String.format("%02d:00 = %s", hour, TimeConverter.to12HourFormat(hour));
+            JOptionPane.showMessageDialog(this, result, "24h to 12h Conversion", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid number", 
+                                        "Input Error", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), 
+                                        "Conversion Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // EFFECTS: Calculates end time based on start time and duration
+    private void calculateEndTime() {
+        String startInput = JOptionPane.showInputDialog(this, 
+            "Enter start time (e.g., '14', '2 PM', '14:00'):");
+        if (startInput == null) return;
+        
+        String durationInput = JOptionPane.showInputDialog(this, 
+            "Enter duration in hours:");
+        if (durationInput == null) return;
+        
+        try {
+            int startHour = TimeConverter.parseTimeInput(startInput);
+            int duration = Integer.parseInt(durationInput);
+            if (duration <= 0) {
+                throw new IllegalArgumentException("Duration must be positive");
+            }
+            
+            int endHour = TimeConverter.calculateEndTime(startHour, duration);
+            String start12 = TimeConverter.to12HourFormat(startHour);
+            String end12 = TimeConverter.to12HourFormat(endHour);
+            String start24 = TimeConverter.to24HourString(startHour);
+            String end24 = TimeConverter.to24HourString(endHour);
+            
+            String result = String.format("Start: %s (%s)\nDuration: %d hours\nEnd: %s (%s)", 
+                                        start12, start24, duration, end12, end24);
+            JOptionPane.showMessageDialog(this, result, "End Time Calculation", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), 
+                                        "Calculation Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numbers", 
+                                        "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // EFFECTS: Checks if two time ranges overlap
+    private void checkTimeOverlap() {
+        String start1Input = JOptionPane.showInputDialog(this, 
+            "Enter first start time (e.g., '9 AM'):");
+        if (start1Input == null) return;
+        
+        String duration1Input = JOptionPane.showInputDialog(this, 
+            "Enter first duration (hours):");
+        if (duration1Input == null) return;
+        
+        String start2Input = JOptionPane.showInputDialog(this, 
+            "Enter second start time (e.g., '10 AM'):");
+        if (start2Input == null) return;
+        
+        String duration2Input = JOptionPane.showInputDialog(this, 
+            "Enter second duration (hours):");
+        if (duration2Input == null) return;
+        
+        try {
+            int start1 = TimeConverter.parseTimeInput(start1Input);
+            int duration1 = Integer.parseInt(duration1Input);
+            int start2 = TimeConverter.parseTimeInput(start2Input);
+            int duration2 = Integer.parseInt(duration2Input);
+            
+            if (duration1 <= 0 || duration2 <= 0) {
+                throw new IllegalArgumentException("Durations must be positive");
+            }
+            
+            boolean overlap = TimeConverter.hasTimeOverlap(start1, duration1, start2, duration2);
+            String start1Str = TimeConverter.to12HourFormat(start1);
+            String start2Str = TimeConverter.to12HourFormat(start2);
+            String end1Str = TimeConverter.to12HourFormat(TimeConverter.calculateEndTime(start1, duration1));
+            String end2Str = TimeConverter.to12HourFormat(TimeConverter.calculateEndTime(start2, duration2));
+            
+            String result = String.format("Time Range 1: %s - %s (%d hours)\nTime Range 2: %s - %s (%d hours)\n\nOverlap: %s", 
+                                        start1Str, end1Str, duration1, start2Str, end2Str, duration2, 
+                                        overlap ? "YES" : "NO");
+            JOptionPane.showMessageDialog(this, result, "Time Overlap Check", 
+                                        JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), 
+                                        "Calculation Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Please enter valid numbers", 
+                                        "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 }
