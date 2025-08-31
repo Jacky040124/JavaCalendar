@@ -36,23 +36,38 @@ Well, I am really interested in time management software myself, and I've been u
 
 ### Managing Tasks
 - To add a task:
-  1. Click Add
+  1. Click "Add Task"
   2. Enter name
   3. Enter length in hours 
-  4. Enter day number (0-6 0 is monday)
-  5. Enter time (24-hour format)
+  4. Select day from dropdown (Monday-Sunday)
+  5. Enter time (multiple formats supported):
+     - 24-hour format: 16 (for 4PM)
+     - 12-hour format: 4 PM, 2:00 PM
+     - HH:MM format: 14:00
 
 - To mark a task as done:
-  1. Click Mark Done button
+  1. Click "Mark Done" button
   2. Select task
-  3. Task will appear with a ✓ if sucessful
+  3. Task will appear with a ✓ if successful
 
 - To remove a task:
-  1. Click remove button
+  1. Click "Remove Task" button
   2. Select task to remove
+
+### Time Calculator Features
+- **Convert 12h to 24h**: Convert times like "2:00 PM" to "14:00"
+- **Convert 24h to 12h**: Convert times like "14" to "2:00 PM"
+- **Calculate End Time**: Find when a task ends based on start time and duration
+- **Check Time Overlap**: Determine if two time ranges conflict
 
 ### Visual Component
 The calendar logo appears in the top-right corner.
+
+### Enhanced Display Features
+- **Dual Time Format**: Calendar shows both 24-hour and 12-hour formats (e.g., "14:00 (2:00 PM)")
+- **Better Task Information**: Task list shows day names, time ranges, and completion status
+- **Improved Day Selection**: Dropdown menu for selecting days instead of entering numbers
+- **Time Range Display**: Tasks show start and end times in readable format
 
 ### Saving and Loading
 - To save your current tasks:
